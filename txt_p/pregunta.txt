@@ -1,0 +1,35 @@
+El procesocontrolador es el encargado de revivir al proceso suicida?
+Puedo usar waitpid en el proceso control?
+Yo defino el idprocctrl?
+
+notación:
+
+
+sui idsui dir :: idprocctrl vidas
+     ****
+
+waitpid
+limitar entrada y salida, compartido, herencia
+escritura y lectura
+
+0 entrada
+1 salida
+2 error estándar
+
+Compilar con advertencias
+g++ -o fichero_salida -Wall -g  fichero_entrada.cpp
+
+gdb programa core.(número)
+//debug
+
+la memoria dinámica se libera 
+// delete
+
+siempre borrar core
+// rm core.*
+
+ulimit -a // muestra todo
+mirar el tamaño del sistema
+usar bt para ver el core
+
+usuario: fcardona (bitbucket)

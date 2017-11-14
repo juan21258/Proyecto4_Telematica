@@ -4,6 +4,12 @@ from pyspark.sql import SQLContext
 from pyspark.sql import Row
 from pyspark.sql.types import *
 from pyspark.ml.feature import HashingTF, IDF, Tokenizer
+from numpy import array
+from math import sqrt
+from pyspark.mllib.clustering import KMeans, KMeansModel
+from sklearn.metrics.pairwise import cosine_similarity
+from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
+from pyspark.ml.feature import Normalizer
 import os
 
 conf = SparkConf()
@@ -11,7 +17,6 @@ conf.setAppName('appSpark')
 conf.setMaster("local[32]")
 sc = SparkContext(conf=conf)
 sqlContext = SQLContext(sc)
-
 
 path ='./txt_p'
 files = [f for f in os.listdir(path) if os.path.split(f)]
@@ -35,7 +40,15 @@ featurizedData = hashingTF.transform(wordsData)
 idf = IDF(inputCol="rawFeatures", outputCol="features")
 idfModel = idf.fit(featurizedData)
 rescaledData = idfModel.transform(featurizedData)
-rescaledData.select("title", "features").show()
+#rescaledData.select("title", "features").show()
 
+normalizer = Normalizer(inputCol="features", outputCol="norm")
+data = normalizer.transform(rescaledData)
+
+mat = IndexedRowMatrix(
+    data.select("num", "norm")\
+        .rdd.map(lambda row: IndexedRow(row.num, row.norm.toArray()))).toBlockMatrix()
+dot = mat.multiply(mat.transpose())
+dot.toLocalMatrix().toArray()
 
 sc.stop()
