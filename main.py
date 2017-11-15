@@ -10,6 +10,7 @@ from pyspark.mllib.clustering import KMeans, KMeansModel
 from sklearn.metrics.pairwise import cosine_similarity
 from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
 from pyspark.ml.feature import Normalizer
+import pyspark.sql.functions as psf
 import os
 
 conf = SparkConf()
@@ -40,7 +41,9 @@ featurizedData = hashingTF.transform(wordsData)
 idf = IDF(inputCol="rawFeatures", outputCol="features")
 idfModel = idf.fit(featurizedData)
 rescaledData = idfModel.transform(featurizedData)
-#rescaledData.select("title", "features").show()
+rescaledData.select("title", "features").show()
+
+#rescaledData.printSchema()
 
 normalizer = Normalizer(inputCol="features", outputCol="norm")
 data = normalizer.transform(rescaledData)
@@ -50,5 +53,14 @@ mat = IndexedRowMatrix(
         .rdd.map(lambda row: IndexedRow(row.num, row.norm.toArray()))).toBlockMatrix()
 dot = mat.multiply(mat.transpose())
 dot.toLocalMatrix().toArray()
+
+dot_udf = psf.udf(lambda x,y: float(x.dot(y)), DoubleType())
+data.alias("i").join(data.alias("j"), psf.col("i.num") < psf.col("j.num"))\
+    .select(
+        psf.col("i.num").alias("i"), 
+        psf.col("j.num").alias("j"), 
+        dot_udf("i.norm", "j.norm").alias("dot"))\
+    .sort("i", "j")\
+    .show()
 
 sc.stop()
