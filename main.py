@@ -6,12 +6,15 @@ from pyspark.sql.types import *
 from pyspark.ml.feature import HashingTF, IDF, Tokenizer
 from numpy import array
 from math import sqrt
-from pyspark.mllib.clustering import KMeans, KMeansModel
+#from pyspark.mllib.clustering import KMeans, KMeansModel
+from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
 from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
 from pyspark.ml.feature import Normalizer
 import pyspark.sql.functions as psf
 import os
+import numpy as np
+from sklearn.cluster import SpectralClustering
 
 conf = SparkConf()
 conf.setAppName('appSpark')
@@ -21,6 +24,7 @@ sqlContext = SQLContext(sc)
 
 path ='./txt_p'
 files = [f for f in os.listdir(path) if os.path.split(f)]
+filecontent = len(files)
 dataset = []
 cont = 0
 for f in files:
@@ -63,4 +67,51 @@ data.alias("i").join(data.alias("j"), psf.col("i.num") < psf.col("j.num"))\
     .sort("i", "j")\
     .show()
 
+tempcosine = data.alias("i").join(data.alias("j"), psf.col("i.num") < psf.col("j.num"))\
+    			.select(
+        			psf.col("i.num").alias("i"), 
+        			psf.col("j.num").alias("j"), 
+        			dot_udf("i.norm", "j.norm").alias("dot"))\
+    			.sort("i", "j")
+
+sizeval = len(tempcosine.select("dot").collect())
+valuesi = []
+valuesj = []
+valuepair = []
+print sizeval
+run = 0
+
+tempval = tempcosine.select("dot")
+valueobtained = (tempval.groupBy().mean()).collect()[5]
+print valueobtained
+'''
+while run < sizeval:
+	valuesi.append(tempcosine.select("i").collect()[run])
+	valuesj.append(tempcosine.select("j").collect()[run])
+	valuepair.append(tempcosine.select("dot").collect()[run])
+	run = run + 1
+'''
+'''
+similmatrix = np.zeros((filecontent,filecontent))
+print trysome
+pos = 0
+
+while pos < sizeval:
+	x = valuesi[pos]
+	y = valuesj[pos]
+	value = valuepair[pos]
+	similmatrix[x][y] = value
+	pos = pos + 1
+
+print similmatrix
+
+mat = np.matrix([[1.0,0.0,0.18662266787146495,0.0],[0.0,1,0.0,0.1810105743631082],
+	[0.18662266787146495,0.0,1.0,0.0],[0.0,0.1810105743631082,0.0,1.0]])
+SpectralClustering(2).fit_predict(mat)
+
+eigen_values, eigen_vectors = np.linalg.eigh(mat)
+s = KMeans(n_clusters=2, init='k-means++').fit_predict(eigen_vectors[:, 2:4])
+
+print s
+'''
 sc.stop()
