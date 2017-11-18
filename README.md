@@ -1,6 +1,7 @@
 Integrantes:
 
 Juan David Perez Perez
+
 Andres Alejandro Atehortua Parra
 
 Este proyecto es una aplicación con tecnología y modelo de programación
@@ -27,12 +28,16 @@ Para el presente proyecto se hizo uso de las siguientes tecnologias:
 
 Python
 http://docs.python-guide.org/en/latest/starting/install/linux/
+
 Pyspark
 https://blog.sicara.com/get-started-pyspark-jupyter-guide-tutorial-ae2fe84f594f
+
 Numpy
 https://docs.scipy.org/doc/numpy-1.13.0/user/install.html
+
 Scipy
 https://www.scipy.org/install.html
+
 Sklearn kit
 http://scikit-learn.org/stable/install.html
 
