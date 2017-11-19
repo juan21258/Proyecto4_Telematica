@@ -6,7 +6,6 @@ from pyspark.sql.types import *
 from pyspark.ml.feature import HashingTF, IDF, Tokenizer
 from numpy import array
 from math import sqrt
-#from pyspark.mllib.clustering import KMeans, KMeansModel
 from sklearn.cluster import KMeans
 from sklearn.metrics.pairwise import cosine_similarity
 from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
@@ -40,7 +39,6 @@ for f in files:
 rdd = sc.parallelize(dataset)
 shemaData = rdd.map(lambda x: Row(num=x[0], title=x[1], text=x[2]))
 dataFrame = sqlContext.createDataFrame(shemaData)
-#dataFrame.select("num", "title").show()
 tokenizer = Tokenizer(inputCol="text", outputCol="words")
 wordsData = tokenizer.transform(dataFrame)
 hashingTF = HashingTF(inputCol="words", outputCol="rawFeatures")
@@ -120,7 +118,7 @@ while  reverse >= 0:
 		j = j + 1
 	reverse = reverse - 1
 
-print similmatrix
+print (similmatrix)
 
 #numero de clusters y matriz de similaridad
 SpectralClustering(2).fit_predict(similmatrix)
@@ -129,7 +127,7 @@ eigen_values, eigen_vectors = np.linalg.eigh(similmatrix)
 #valor de k y cantidad de archivos
 orderedclusters = KMeans(n_clusters=2, init='k-means++').fit_predict(eigen_vectors[:, 2:filecontent])
 
-print orderedclusters
+print (orderedclusters)
 
 kvalue = 2 #numero k
 
@@ -149,7 +147,7 @@ while recorrido < kvalue:
             temp += ", "
         index += 1
     index = 0
-    print temp
+    print (temp)
     temp = "Cluster "
     group += 1
     recorrido += 1
