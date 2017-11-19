@@ -31,7 +31,7 @@ dataset = []
 cont = 0
 for f in files:
 	j = os.path.join(path, f)
-	with open(j, 'r') as myfile:
+	with open(j, 'r', errors='ignore') as myfile:
 		data=myfile.read().replace('\n', '')
 		cont = cont + 1
 		dataset.append((cont,f,data))		
