@@ -41,8 +41,16 @@ https://www.scipy.org/install.html
 Sklearn kit
 http://scikit-learn.org/stable/install.html
 
+En el directorio del proyecto se debe crear una carpeta con el nombre "txt_p" en el cual se ingresan los archivos txt que
+se usaran para aplicar el algoritmo.
+
+Para cambiar el valor de k que se desea usar simplemente cambiar los numeros 2 que se muestran en la imagen
+![Alt text](https://image.prntscr.com/image/utSD_GK2QkCh15Hb4B_1VQ.png "Optional title")
+
 La ejecucion en una maquina local es:
 $ python main.py
+
+Si se desea ejecutar en el cluster o DCA se debe bajar el branch cluster del repositorio
 
 En un cluster:
 $ spark-submit  \
